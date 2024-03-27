@@ -1,8 +1,12 @@
-package org.github.aastrandemma.model;
+package org.github.aastrandemma.data.implementation;
+
+import org.github.aastrandemma.data.model.Product;
+import org.github.aastrandemma.util.FormatData;
 
 public class VendingMachineImpl implements IVendingMachine {
     private final Product[] products;
     private int depositPool;
+    private int dispenseChange;
 
     public VendingMachineImpl(Product[] products) {
         this.products = products;
@@ -23,7 +27,7 @@ public class VendingMachineImpl implements IVendingMachine {
             }
         }
         if (match == 0) {
-            System.out.println("The vending machine can't accept: " + amount);
+            System.out.println("The vending machine can't accept: " + amount + ",00");
         }
     }
 
@@ -37,12 +41,12 @@ public class VendingMachineImpl implements IVendingMachine {
         for (Product item : products) {
             if (id == item.getId()) {
                 if(depositPool >= (int)item.getPrice()) {
-                    item.setQuantity(1);
                     depositPool = (int) (depositPool - item.getPrice());
+                    System.out.println(item.use());
                 } else {
                     int calculate = (int) item.getPrice() - depositPool;
                     System.out.println(item.getProductName() + " cost "
-                            + item.formatPrice(item.getPrice()) + "SEK, you need to deposit " + calculate + "SEK");
+                            + FormatData.formatPrice((item.getPrice())) + "SEK, you need to deposit " + calculate + ",00SEK");
                 }
                 return item;
             }
@@ -52,7 +56,10 @@ public class VendingMachineImpl implements IVendingMachine {
 
     @Override
     public int endSession() {
-        return depositPool = 0;
+        dispenseChange = dispenseChange + depositPool;
+        System.out.println("Here is your change " + dispenseChange +",00SEK. Thank you, bye!");
+        depositPool = 0;
+        return depositPool;
     }
 
     @Override
@@ -70,7 +77,7 @@ public class VendingMachineImpl implements IVendingMachine {
         String[] examineProducts = new String[getSize()];
         int i = 0;
         for (Product item : products) {
-            examineProducts[i] = "Id: " + item.getId() + ", " + getDescription(item.getId());
+            examineProducts[i] = "id: " + item.getId() + ", name: " + item.getProductName() + ", price: " + FormatData.formatPrice(item.getPrice());
             i++;
         }
         return examineProducts;
